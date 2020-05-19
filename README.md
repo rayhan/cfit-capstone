@@ -1,4 +1,7 @@
-<include a CircleCI status badge, here>
+[![DevOps_Microservices](https://circleci.com/gh/rayhan/DevOps_Microservices.svg?style=svg)](https://circleci.com/gh/circleci/circleci-docs)
+
+
+github/rayhan/rayhan
 
 ## Project Overview
 
