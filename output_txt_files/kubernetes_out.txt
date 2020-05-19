@@ -1,0 +1,25 @@
+root@kube-master1:~/cfit-k8s# sh make_prediction.sh
+Port: 8000
+{
+  "prediction": [
+    20.35373177134412
+  ]
+}
+
+
+root@kube-master1:~/cfit-k8s# sh run_kubernetes.sh
+deployment.apps/ml-prediction configured
+NAME                                     READY   STATUS              RESTARTS   AGE
+librarika-nginx-cache-6ccd8ffdd5-pr2mc   1/1     Running             0          52d
+marcs-v1-76c9984856-j54jh                1/1     Running             0          52d
+ml-prediction-64c76f7df6-4lrnh           1/1     Running             0          11m
+ml-prediction-64c76f7df6-b67mg           1/1     Terminating         0          11m
+ml-prediction-64c76f7df6-qbzr9           1/1     Running             0          11m
+ml-prediction-77758c5cc5-lqlq4           0/1     ContainerCreating   0          0s
+php-apache-5c4f475bf5-krllc              1/1     Running             0          7d1h
+Forwarding from 127.0.0.1:8000 -> 80
+Forwarding from [::1]:8000 -> 80
+Handling connection for 8000
+
+
+
