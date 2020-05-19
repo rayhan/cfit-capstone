@@ -1,7 +1,5 @@
-[![DevOps_Microservices](https://circleci.com/gh/rayhan/DevOps_Microservices.svg?style=svg)](https://circleci.com/gh/circleci/circleci-docs)
+[![DevOps_Microservices](https://circleci.com/gh/rayhan/DevOps_Microservices.svg?style=svg)](https://github.com/rayhan/DevOps_Microservices)
 
-
-github/rayhan/rayhan
 
 ## Project Overview
 
