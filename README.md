@@ -3,41 +3,45 @@
 
 ## Project Overview
 
-In this project, you will apply the skills you have acquired in this course to operationalize a Machine Learning Microservice API. 
-
-You are given a pre-trained, `sklearn` model that has been trained to predict housing prices in Boston according to several features, such as average rooms in a home and data about highway access, teacher-to-pupil ratios, and so on. You can read more about the data, which was initially taken from Kaggle, on [the data source site](https://www.kaggle.com/c/boston-housing). This project tests your ability to operationalize a Python flask app—in a provided file, `app.py`—that serves out predictions (inference) about housing prices through API calls. This project could be extended to any pre-trained machine learning model, such as those for image recognition and data labeling.
-
-### Project Tasks
-
-Your project goal is to operationalize this working, machine learning microservice using [kubernetes](https://kubernetes.io/), which is an open-source system for automating the management of containerized applications. In this project you will:
-* Test your project code using linting
-* Complete a Dockerfile to containerize this application
-* Deploy your containerized application using Docker and make a prediction
-* Improve the log statements in the source code for this application
-* Configure Kubernetes and create a Kubernetes cluster
-* Deploy a container using Kubernetes and make a prediction
-* Upload a complete Github repo with CircleCI to indicate that your code has been tested
-
-You can find a detailed [project rubric, here](https://review.udacity.com/#!/rubrics/2576/view).
-
-**The final implementation of the project will showcase your abilities to operationalize production microservices.**
+This project utilize a pre-traind machine learning model and productionalize the ML prediction appication with in containerized scallable deployment environment.
 
 ---
+## Dependencies
+ - python3
+ - pip
+ - venv
+ - Docker
+ - Virtualbox
+ - Kubernetes (minikube / sandalone cluster)
 
-## Setup the Environment
+ 
+## Instruction
 
-* Create a virtualenv and activate it
-* Run `make install` to install the necessary dependencies
+- Create a virtualenv and activate it
+    
+    ```
+  python3 -m venv ~/.devops
+  source ~/.devops/bin/activate   
+    ```
+- Run `make install` to install the necessary dependencies
 
 ### Running `app.py`
 
 1. Standalone:  `python app.py`
 2. Run in Docker:  `./run_docker.sh`
 3. Run in Kubernetes:  `./run_kubernetes.sh`
+4. Run prediction : `./make_prediction.sh`
 
-### Kubernetes Steps
+### Project Files
 
-* Setup and Configure Docker locally
-* Setup and Configure Kubernetes locally
-* Create Flask app in Container
-* Run via kubectl
+- `.circleci/config.yml` contains circleci CI/CD pipeline configuration
+- `model_data` folder contains pe-trained prediction model
+- `app.py` main application file to run prediction API.
+- `Dockerfile` docker build instructions to containerzie the python app
+- `make_prediction.sh` test prediction by making HTTP call
+- `makefile` The Makefile includes instructions on environment setup and lint tests
+- `requirements.txt` contains python dependency list to install relevant python modules/libraries
+- `run_docker.sh` a shell script that build and run docker container for the app
+- `run_kubernates.sh` a shell script to run kubernetes deployment for the prediction app
+- `upload_docker.sh` uploads docker image to dockerhub 
+- `output_txt_files/docker_out.txt` and `output_txt_files/kubernetes_out.png` contains output of run_docker and run_kubernetes command
