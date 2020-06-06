@@ -1,36 +1,32 @@
 import 'source-map-support/register'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
-import { getUserId } from '../utils'
-
-
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-
 import { createLogger } from '../../utils/logger'
-const logger = createLogger('api_calls')
+import {getImageItem, generateUploadUrl} from "../../businessLogic/images";
+// import { getUserId } from '../utils'
 
-import {getTodoItem, generateUploadUrl} from "../../businessLogic/todos";
+const logger = createLogger('api_calls')
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   logger.info('Processing event .. ', event)
 
-  const todoId = event.pathParameters.todoId
-  const userId = getUserId(event)
+  const imageId = event.pathParameters.imageId
 
   // Velidate user owns the requested item.
-  const todoItem = await getTodoItem(todoId, userId)
+  const imageItem = await getImageItem(imageId)
 
-  if (!todoItem) {
+  if (!imageItem) {
     return {
       statusCode: 404,
       body: JSON.stringify({
-        message: 'Todo does not exist'
+        message: 'Image does not exist'
       })
     }
   }
 
-  const signedUrl = generateUploadUrl(todoId, userId)
-  logger.info('Signed upload url generated', {todoId: todoId, userId: userId, signedUrl: signedUrl})
+  const signedUrl = generateUploadUrl(imageId)
+  logger.info('Signed upload url generated', {imageId: imageId, signedUrl: signedUrl})
 
   return {
     statusCode: 200,

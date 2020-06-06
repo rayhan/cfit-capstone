@@ -9,7 +9,7 @@ import {S3} from 'aws-sdk'
  */
 export function getS3SignedUrl(imageId: string, operation: string): string {
 
-    const bucket = process.env.TODOS_S3_BUCKET
+    const bucket = process.env.IMAGES_S3_BUCKET
     const urlExpiration = process.env.SIGNED_URL_EXPIRATION
   
     const s3 = new S3({

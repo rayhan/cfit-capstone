@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "type": "object",
+  "title": "Create New Image Request Schema",
+  "description": "The json schema to create new image request.",
+  "properties": {
+    "imageType": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "imageType"
+  ],
+  "additionalProperties": false
+}

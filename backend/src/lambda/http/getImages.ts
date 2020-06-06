@@ -1,20 +1,17 @@
 import 'source-map-support/register'
-import { getUserId } from '../utils'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
-
-import { createLogger } from '../../utils/logger'
-const logger = createLogger('api_calls')
-
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { createLogger } from '../../utils/logger'
+import {getImageItems} from "../../businessLogic/images";
+// import { getUserId } from '../utils'
 
-import {getTodoItems} from "../../businessLogic/todos";
+const logger = createLogger('api_calls')
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   logger.info('Processing event .. ', event)
 
-  const userId = getUserId(event);
-  const items = await getTodoItems(userId);
+  const items = await getImageItems(null);
 
   logger.info('Items retrieved', items)
 
