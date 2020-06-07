@@ -12,6 +12,20 @@ Applications owner will be able to specify imageType parameters to identify imag
 
 List all images with optional `imageType=?` query parameters. If not imageType is not provided, then default value "images" will be used.
 
+```
+{
+    "items": [
+        {
+            "createdAt": "2020-06-07T19:04:44.980Z",
+            "sizes": null,
+            "imageId": "8121a4f0-9ab4-4cbd-8e5c-a1aa1f8bd433",
+            "url": "https://sls-image-dev.s3.amazonaws.com/images/8121a4f0-9ab4-4cbd-8e5c-a1aa1f8bd433",
+            "imageType": "images"
+        }
+    ]
+}
+```
+
 ### POST /images
 
 Create a new image record and get the signed url to upload the image. You need to specify imageType to identify the purpose of images. E.g. images or users or products etc
