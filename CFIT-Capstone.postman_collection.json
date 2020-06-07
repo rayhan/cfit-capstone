@@ -1,48 +1,74 @@
 {
 	"info": {
-		"_postman_id": "d0700d24-79ec-487e-8403-b565bef7f8e0",
-		"name": "Udacity C4 Project",
+		"_postman_id": "2de11a63-8a3d-4fad-a8a9-567a4fb9ee96",
+		"name": "CFIT-Capstone",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "TODOs",
+			"name": "AWS Image Pipeline",
 			"item": [
 				{
-					"name": "Get all todos",
+					"name": "Get all Images",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
+								"key": "X-API-Key",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos",
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/images",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
 								"execute-api",
-								"us-east-1",
+								"{{region}}",
 								"amazonaws",
 								"com"
 							],
 							"path": [
 								"dev",
-								"todos"
+								"images"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Create todo",
+					"name": "Get Image",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{apiKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/images/96b4fd06-f8d2-4a44-bc97-65a6dad5236e",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"{{region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"images",
+								"96b4fd06-f8d2-4a44-bc97-65a6dad5236e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Image",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -53,75 +79,35 @@
 								"type": "text"
 							},
 							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
+								"key": "x-api-key",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Water flowers\",\n\t\"dueDate\": \"2019-06-11\"\n}"
+							"raw": "{\n\t\"imageType\": \"images\"\n}"
 						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos",
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/images",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
 								"execute-api",
-								"us-east-1",
+								"{{region}}",
 								"amazonaws",
 								"com"
 							],
 							"path": [
 								"dev",
-								"todos"
+								"images"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Update todo",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "Bearer {{authToken}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Change the world\",\n\t\"dueDate\": \"2019-12-11\",\n\t\"done\": true\n}"
-						},
-						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos/35dd600f-43c2-4649-903c-615e1586a26f",
-							"protocol": "https",
-							"host": [
-								"{{apiId}}",
-								"execute-api",
-								"us-east-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"dev",
-								"todos",
-								"35dd600f-43c2-4649-903c-615e1586a26f"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete todo",
+					"name": "Delete Image",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -132,9 +118,9 @@
 								"value": "application/json"
 							},
 							{
-								"key": "Authorization",
+								"key": "x-api-key",
 								"type": "text",
-								"value": "Bearer {{authToken}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -142,54 +128,19 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos/fe671583-4512-45f6-9475-4265c04362fb",
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/images/96b4fd06-f8d2-4a44-bc97-65a6dad5236e",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
 								"execute-api",
-								"us-east-1",
+								"{{region}}",
 								"amazonaws",
 								"com"
 							],
 							"path": [
 								"dev",
-								"todos",
-								"fe671583-4512-45f6-9475-4265c04362fb"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get attachment URL",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos/3836b777-9bc4-4429-9b79-ba4e4f5f91c0/attachment",
-							"protocol": "https",
-							"host": [
-								"{{apiId}}",
-								"execute-api",
-								"us-east-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"dev",
-								"todos",
-								"3836b777-9bc4-4429-9b79-ba4e4f5f91c0",
-								"attachment"
+								"images",
+								"96b4fd06-f8d2-4a44-bc97-65a6dad5236e"
 							]
 						}
 					},
@@ -244,14 +195,20 @@
 	],
 	"variable": [
 		{
-			"id": "bf208e6b-f66d-4008-9366-dd541ff65425",
+			"id": "b51a53ca-6fb1-4c0c-9918-8c42027a3148",
 			"key": "apiId",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "9bc6399a-d2bb-4f2d-9ffa-8480370d383c",
-			"key": "authToken",
+			"id": "518101f1-9edb-419e-bce1-e72182aff7c7",
+			"key": "apiKey",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "3c02aa17-7108-455f-9bcc-2e543b7a1c55",
+			"key": "region",
 			"value": "",
 			"type": "string"
 		}

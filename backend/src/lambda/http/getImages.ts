@@ -10,8 +10,9 @@ const logger = createLogger('api_calls')
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   logger.info('Processing event .. ', event)
+  const imageType = event.queryStringParameters.imageType
 
-  const items = await getImageItems(null);
+  const items = await getImageItems(imageType);
 
   logger.info('Items retrieved', items)
 

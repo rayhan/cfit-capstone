@@ -1,223 +1,67 @@
-# Serverless TODO
+# Serverless Image Pipeline
 
-To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
+This serverless image pipeline project offers simplified image processing processing APIs using AWS lampda and S3 based image procesing needs. Which can be extended to provide more feature rich experience in the future.
 
-# Functionality of the application
+## Functionality of the application
 
-This application will allow creating/removing/updating/fetching TODO items. Each TODO item can optionally have an attachment image. Each user only has access to TODO items that he/she has created.
+This application provide following HTTP APIs protected by AWS APIGateway ApiKeys for application developers who can generate signed URLs and use AWS lamba capability to scale the image processing pipeline for their applications.
 
-# TODO items
+Applications owner will be able to specify imageType parameters to identify images belongs to a specific types such as products, users, albums, etc. Later it can be extended to add more features.
 
-The application should store TODO items, and each TODO item contains the following fields:
+### GET /images
 
-* `todoId` (string) - a unique id for an item
-* `createdAt` (string) - date and time when an item was created
-* `name` (string) - name of a TODO item (e.g. "Change a light bulb")
-* `dueDate` (string) - date and time by which an item should be completed
-* `done` (boolean) - true if an item was completed, false otherwise
-* `attachmentUrl` (string) (optional) - a URL pointing to an image attached to a TODO item
+List all images with optional `imageType=?` query parameters. If not imageType is not provided, then default value "images" will be used.
 
-You might also store an id of a user who created a TODO item.
+### POST /images
 
+Create a new image record and get the signed url to upload the image. You need to specify imageType to identify the purpose of images. E.g. images or users or products etc
 
-# Functions to be implemented
+Reqeust:
 
-To implement this project, you need to implement the following functions and configure them in the `serverless.yml` file:
-
-* `Auth` - this function should implement a custom authorizer for API Gateway that should be added to all other functions.
-
-* `GetTodos` - should return all TODOs for a current user. A user id can be extracted from a JWT token that is sent by the frontend
-
-It should return data that looks like this:
-
-```json
+```
 {
-  "items": [
-    {
-      "todoId": "123",
-      "createdAt": "2019-07-27T20:01:45.424Z",
-      "name": "Buy milk",
-      "dueDate": "2019-07-29T20:01:45.424Z",
-      "done": false,
-      "attachmentUrl": "http://example.com/image.png"
+	"imageType": "images"
+}
+```
+
+Response:   
+
+```
+{
+    "item": {
+        "imageId": "de488b0d-4bac-4d8d-a4b3-48de11609523",
+        "imageType": "images",
+        "createdAt": "2020-06-07T18:57:14.692Z",
+        "url": null,
+        "sizes": null
     },
-    {
-      "todoId": "456",
-      "createdAt": "2019-07-27T20:01:45.424Z",
-      "name": "Send a letter",
-      "dueDate": "2019-07-29T20:01:45.424Z",
-      "done": true,
-      "attachmentUrl": "http://example.com/image.png"
-    },
-  ]
+    "uploadUrl": "....."
 }
 ```
 
-* `CreateTodo` - should create a new TODO for a current user. A shape of data send by a client application to this function can be found in the `CreateTodoRequest.ts` file
+### GET /images/{imageId}
 
-It receives a new TODO item to be created in JSON format that looks like this:
+Get an single image information.
 
-```json
+Response:  
+
+```
 {
-  "createdAt": "2019-07-27T20:01:45.424Z",
-  "name": "Buy milk",
-  "dueDate": "2019-07-29T20:01:45.424Z",
-  "done": false,
-  "attachmentUrl": "http://example.com/image.png"
+    "createdAt": "2020-06-07T18:57:14.692Z",
+    "imageId": "de488b0d-4bac-4d8d-a4b3-48de11609523",
+    "sizes": null,
+    "url": null,
+    "imageType": "images"
 }
 ```
 
-It should return a new TODO item that looks like this:
+### DELETE /images/{imageId}
 
-```json
-{
-  "item": {
-    "todoId": "123",
-    "createdAt": "2019-07-27T20:01:45.424Z",
-    "name": "Buy milk",
-    "dueDate": "2019-07-29T20:01:45.424Z",
-    "done": false,
-    "attachmentUrl": "http://example.com/image.png"
-  }
-}
-```
-
-* `UpdateTodo` - should update a TODO item created by a current user. A shape of data send by a client application to this function can be found in the `UpdateTodoRequest.ts` file
-
-It receives an object that contains three fields that can be updated in a TODO item:
-
-```json
-{
-  "name": "Buy bread",
-  "dueDate": "2019-07-29T20:01:45.424Z",
-  "done": true
-}
-```
-
-The id of an item that should be updated is passed as a URL parameter.
-
-It should return an empty body.
-
-* `DeleteTodo` - should delete a TODO item created by a current user. Expects an id of a TODO item to remove.
-
-It should return an empty body.
-
-* `GenerateUploadUrl` - returns a pre-signed URL that can be used to upload an attachment file for a TODO item.
-
-It should return a JSON object that looks like this:
-
-```json
-{
-  "uploadUrl": "https://s3-bucket-name.s3.eu-west-2.amazonaws.com/image.png"
-}
-```
-
-All functions are already connected to appropriate events from API Gateway.
-
-An id of a user can be extracted from a JWT token passed by a client.
-
-You also need to add any necessary resources to the `resources` section of the `serverless.yml` file such as DynamoDB table and S3 bucket.
-
-
-# Frontend
-
-The `client` folder contains a web application that can use the API that should be developed in the project.
-
-This frontend should work with your serverless application once it is developed, you don't need to make any changes to the code. The only file that you need to edit is the `config.ts` file in the `client` folder. This file configures your client application just as it was done in the course and contains an API endpoint and Auth0 configuration:
-
-```ts
-const apiId = '...' API Gateway id
-export const apiEndpoint = `https://${apiId}.execute-api.us-east-1.amazonaws.com/dev`
-
-export const authConfig = {
-  domain: '...',    // Domain from Auth0
-  clientId: '...',  // Client id from an Auth0 application
-  callbackUrl: 'http://localhost:3000/callback'
-}
-```
+Delete an existing image record.
 
 ## Authentication
 
-To implement authentication in your application, you would have to create an Auth0 application and copy "domain" and "client id" to the `config.ts` file in the `client` folder. We recommend using asymmetrically encrypted JWT tokens.
-
-# Best practices
-
-To complete this exercise, please follow the best practices from the 6th lesson of this course.
-
-## Logging
-
-The starter code comes with a configured [Winston](https://github.com/winstonjs/winston) logger that creates [JSON formatted](https://stackify.com/what-is-structured-logging-and-why-developers-need-it/) log statements. You can use it to write log messages like this:
-
-```ts
-import { createLogger } from '../../utils/logger'
-const logger = createLogger('auth')
-
-// You can provide additional information with every log statement
-// This information can then be used to search for log statements in a log storage system
-logger.info('User was authorized', {
-  // Additional information stored with a log statement
-  key: 'value'
-})
-```
-
-
-# Grading the submission
-
-Once you have finished developing your application, please set `apiId` and Auth0 parameters in the `config.ts` file in the `client` folder. A reviewer would start the React development server to run the frontend that should be configured to interact with your serverless application.
-
-**IMPORTANT**
-
-*Please leave your application running until a submission is reviewed. If implemented correctly it will cost almost nothing when your application is idle.*
-
-# Suggestions
-
-To store TODO items, you might want to use a DynamoDB table with local secondary index(es). A create a local secondary index you need to create a DynamoDB resource like this:
-
-```yml
-
-TodosTable:
-  Type: AWS::DynamoDB::Table
-  Properties:
-    AttributeDefinitions:
-      - AttributeName: partitionKey
-        AttributeType: S
-      - AttributeName: sortKey
-        AttributeType: S
-      - AttributeName: indexKey
-        AttributeType: S
-    KeySchema:
-      - AttributeName: partitionKey
-        KeyType: HASH
-      - AttributeName: sortKey
-        KeyType: RANGE
-    BillingMode: PAY_PER_REQUEST
-    TableName: ${self:provider.environment.TODOS_TABLE}
-    LocalSecondaryIndexes:
-      - IndexName: ${self:provider.environment.INDEX_NAME}
-        KeySchema:
-          - AttributeName: partitionKey
-            KeyType: HASH
-          - AttributeName: indexKey
-            KeyType: RANGE
-        Projection:
-          ProjectionType: ALL # What attributes will be copied to an index
-
-```
-
-To query an index you need to use the `query()` method like:
-
-```ts
-await this.dynamoDBClient
-  .query({
-    TableName: 'table-name',
-    IndexName: 'index-name',
-    KeyConditionExpression: 'paritionKey = :paritionKey',
-    ExpressionAttributeValues: {
-      ':paritionKey': partitionKeyValue
-    }
-  })
-  .promise()
-```
+This app is protected by AWS ApiGateway API Key based authentication for server to server communication. To get the API Keys run the `sls deploy` command and you will get API keys generated from the API gateway in the output console.
 
 # How to run the application
 
@@ -226,46 +70,18 @@ await this.dynamoDBClient
 To deploy an application run the following commands:
 
 ```
-cd backend
 npm install
 sls deploy -v
 ```
 
-## Frontend
-
-To run a client application first edit the `client/src/config.ts` file to set correct parameters. And then run the following commands:
-
-```
-cd client
-npm install
-npm run start
-```
-
-This should start a development server with the React application that will interact with the serverless TODO application.
-
 # Postman collection
 
-An alternative way to test your API, you can use the Postman collection that contains sample requests. You can find a Postman collection in this project. To import this collection, do the following.
+Postman collection is available in the `CFIT-Capstone.postman_collection.json` file which can be used to test the APIs.
 
-Click on the import button:
+Please update following variables in the Postman collections to test the APIs.
 
-![Alt text](images/import-collection-1.png?raw=true "Image 1")
-
-
-Click on the "Choose Files":
-
-![Alt text](images/import-collection-2.png?raw=true "Image 2")
-
-
-Select a file to import:
-
-![Alt text](images/import-collection-3.png?raw=true "Image 3")
-
-
-Right click on the imported collection to set variables for the collection:
-
-![Alt text](images/import-collection-4.png?raw=true "Image 4")
-
-Provide variables for the collection (similarly to how this was done in the course):
-
-![Alt text](images/import-collection-5.png?raw=true "Image 5")
+```
+- apiId
+- region
+- apiKey
+```

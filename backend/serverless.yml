@@ -40,10 +40,10 @@ provider:
   environment:
     IMAGE_PIPELINE_TABLE: ImageItems-${self:provider.stage}
     IMAGE_INDEX: ImageIndex
-    IMAGES_S3_BUCKET: sls-image-cle-${self:provider.stage}
+    IMAGES_S3_BUCKET: sls-image-${self:provider.stage}
+    THUMBNAILS_S3_BUCKET: sls-thumbs-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    AUTH_0_SECRET_ID: Auth0Secret2-${self:provider.stage}
-    AUTH_0_SECRET_FIELD: auth0SecretCert
+    THUMBNAIL_SIZE: 160
 
   iamRoleStatements:
     - Effect: Allow
@@ -65,14 +65,6 @@ provider:
         - xray:GetSamplingTargets	
         - xray:GetSamplingStatisticSummaries
       Resource: "*"
-    - Effect: Allow
-      Action:
-        - secretsmanager:GetSecretValue
-      Resource: !Ref Auth0Secret
-    - Effect: Allow
-      Action:
-        - kms:Decrypt
-      Resource: !GetAtt KMSKey.Arn
 
 custom:
 
@@ -148,6 +140,10 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGE_PIPELINE_TABLE}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
 
   # GetImage function configuration
   GetImage:
@@ -201,6 +197,31 @@ functions:
           - dynamodb:UpdateItem
           - dynamodb:GetItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGE_PIPELINE_TABLE}
+
+  ResizeImage:
+    handler: src/lambda/s3/resizeImage.handler
+    events:
+      - sns:
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.topicName}
+          topicName: ${self:custom.topicName}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGE_PIPELINE_TABLE}
+
 
 resources:
   Resources:
@@ -274,6 +295,23 @@ resources:
                 - HEAD
               MaxAge: 3000
 
+    # Declare thumbnail bucket
+    ThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.THUMBNAILS_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - HEAD
+              MaxAge: 3000
+
     # Declare SN topic resource
     ImagePipelineTopic:
       Type: AWS::SNS::Topic
@@ -315,36 +353,17 @@ resources:
               Resource: 'arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*'
         Bucket: !Ref ImagesBucket
 
-    KMSKey:
-      Type: AWS::KMS::Key
+    # Polcity to allow public read access to the s3 bucket
+    ThumbnailBucketPolicy:
+      Type: AWS::S3::BucketPolicy
       Properties:
-        Description: KMS key to encrypt Auth0 secret
-        KeyPolicy:
-          Version: '2012-10-17'
-          Id: key-default-2
+        PolicyDocument:
+          Id: MyPolicy2
+          Version: "2012-10-17"
           Statement:
-            - Sid: Allow administration of the key
+            - Sid: PublicReadForGetBucketObjects
               Effect: Allow
-              Principal:
-                AWS:
-                  Fn::Join:
-                  - ':'
-                  - - 'arn:aws:iam:'
-                    - Ref: AWS::AccountId
-                    - 'root'
-              Action:
-                - 'kms:*'
-              Resource: '*'
-
-    KMSKeyAlias:
-      Type: AWS::KMS::Alias
-      Properties:
-        AliasName: alias/auth0Key2-${self:provider.stage}
-        TargetKeyId: !Ref KMSKey
-
-    Auth0Secret:
-      Type: AWS::SecretsManager::Secret
-      Properties:
-        Name: ${self:provider.environment.AUTH_0_SECRET_ID}
-        Description: Auth0 secret
-        KmsKeyId: !Ref KMSKey
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.THUMBNAILS_S3_BUCKET}/*'
+        Bucket: !Ref ThumbnailsBucket

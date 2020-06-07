@@ -47,7 +47,7 @@ export class ImageItemAccess {
     async getImageItems(imageType?: string) : Promise<ImageItem[]> {
 
         if (!imageType) {
-            imageType = 'default';
+            imageType = 'images';
         }
 
         const result = await this.docClient
@@ -97,7 +97,7 @@ export class ImageItemAccess {
             }
         }).promise()
         
-        if (await queryResult.Item) {
+        if (!(await queryResult.Item)) {
             logger.info("Todo item doesn't exist in database.", {Info: {imageId: imageId}})
             return
         }
@@ -114,9 +114,12 @@ export class ImageItemAccess {
             Key: {
                 "imageId": imageId
             },
-            UpdateExpression: "set url = :url",
+            UpdateExpression: "set #url_alias = :url",
             ExpressionAttributeValues: {
                 ":url": url
+            },
+            ExpressionAttributeNames: {
+              "#url_alias": "url"
             },
             ReturnValues: "UPDATED_NEW"
         }).promise();

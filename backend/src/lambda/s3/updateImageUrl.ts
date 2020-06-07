@@ -1,8 +1,6 @@
 import { SNSEvent, SNSHandler, S3EventRecord } from 'aws-lambda'
 import 'source-map-support/register'
 
-// import {updateImageUrl} from "../../businessLogic/todos";
-
 import { createLogger } from '../../utils/logger'
 const logger = createLogger('s3_events')
 
@@ -38,10 +36,10 @@ async function processImage(record: S3EventRecord) {
 
   if (record.eventName === 'ObjectCreated:Put') {
     const bucket = record.s3.bucket.name
-    const imageId = record.s3.object.key
-    const imageUrl = `https://${bucket}.s3.amazonaws.com/${imageId}`
+    const imageKey = record.s3.object.key
+    const imageUrl = `https://${bucket}.s3.amazonaws.com/${imageKey}`
 
-    await updateImageUrl(imageId, imageUrl)
+    await updateImageUrl(imageKey, imageUrl)
   }
 }
 
@@ -51,11 +49,12 @@ async function processImage(record: S3EventRecord) {
  * @param imageId 
  * @param imageUrl 
  */
-async function updateImageUrl(imageId: string, imageUrl: string) {
+async function updateImageUrl(imageKey: string, imageUrl: string) {
 
-  
+  const split = imageKey.split('/')
+  const imageId = split[1]
 
-  logger.info('Fetching todo item from the database.', {Info: {imageId: imageId}})
+  logger.info('Fetching image item from the database.', {Info: {imageId: imageId}})
 
   const resultExisting = await docClient.get({
       TableName : imageTable,
@@ -64,25 +63,28 @@ async function updateImageUrl(imageId: string, imageUrl: string) {
       }
   }).promise()
 
-  if (await resultExisting.Item) {
+  if (!(await resultExisting.Item)) {
     // Log the event
-    logger.info("Todo item doesn't exist in database.", {Info: {imageId: imageId}})
+    logger.info("Image item doesn't exist in database.", {Info: {imageId: imageId}})
     return
   }
 
   var imageItem = await resultExisting.Item as ImageItem
-  logger.info('Todo item fetched from the database', {imageItem: imageItem})
+  logger.info('Image item fetched from the database', {imageItem: imageItem})
 
   // Update record
-  logger.info('Updating todo item to the database', {Info: {imageItem: imageItem, imageUrl: imageUrl}})
+  logger.info('Updating image item to the database', {Info: {imageItem: imageItem, imageUrl: imageUrl}})
   const result = await docClient.update({
       TableName: imageTable,
       Key: {
           "imageId": imageId
       },
-      UpdateExpression: "set imageUrl = :imageUrl",
+      UpdateExpression: "set #url_alias = :imageUrl",
       ExpressionAttributeValues: {
           ":imageUrl": imageUrl
+      },
+      ExpressionAttributeNames: {
+        "#url_alias": "url"
       },
       ReturnValues: "UPDATED_NEW"
   }).promise();

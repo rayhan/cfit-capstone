@@ -21,14 +21,16 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   const imageItem = await createImageItem(newImageRequest)
 
   logger.info("Todo created", imageItem)
-  const imageId = imageItem.imageId
+  
+  const imagePath = encodeURIComponent(imageItem.imageType) + '/' + imageItem.imageId
+  logger.info('Generating signed url for ', {imagePath: imagePath})
 
-  const signedUrl = generateUploadUrl(imageId)
-  logger.info('Signed upload url generated', {imageId: imageId, signedUrl: signedUrl})
+  const signedUrl = generateUploadUrl(imagePath)
+  logger.info('Signed upload url generated', {imagePath: imagePath, signedUrl: signedUrl})
 
   return {
     statusCode: 201,
-    body: JSON.stringify({'item': imageItem, 'signedUrl': signedUrl})
+    body: JSON.stringify({'item': imageItem, 'uploadUrl': signedUrl})
   }
 })
 

@@ -1,10 +1,11 @@
 import * as uuid from 'uuid';
 import {ImageItem} from "../models/ImageItem";
-// import {TodoUpdate} from "../models/TodoUpdate";
 import {CreateImageRequest} from "../requests/CreateImageRequest";
-// import {UpdateTodoRequest} from "../requests/UpdateTodoRequest";
 import {ImageItemAccess} from "../dataLayer/imageItemAccess";
 import { getS3SignedUrl } from '../utils/s3'
+
+// import {TodoUpdate} from "../models/TodoUpdate";
+// import {UpdateTodoRequest} from "../requests/UpdateTodoRequest";
 
 const imageItemAccess = new ImageItemAccess();
 
@@ -28,7 +29,7 @@ export async function createImageItem(createImageRequest: CreateImageRequest) : 
         imageId: imageId,
         imageType: createImageRequest.imageType,
         createdAt: createdAt,
-        name: null,
+        // name: null,
         url: null,
         sizes: null
     })
